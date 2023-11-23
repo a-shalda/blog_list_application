@@ -14,36 +14,35 @@ const Blog = require('../models/blog')
 //     .catch(error => next(error))
 // })
 
-blogRouter.get('/', (request, response) => {
-  Blog
-    .find({})
-    .then(blogs => {
-      response.json(blogs)
-    })
-    .catch(error => next(error))
+blogRouter.get('/', async (request, response) => {
+  const blogs = await Blog.find({})
+  response.json(blogs)
+  // .catch(error => next(error))
 })
 
-// blogRouter.get('/:id', (request, response, next) => {
-//   Blog.findById(request.params.id)
-//     .then(person => {
-//       if (person) {
-//         response.json(person)
-//       } else {
-//         response.status(404).end()
-//       }
-//     })
-//     .catch(error => next(error))
-// })
-
-blogRouter.delete('/:id', (request, response, next) => {
-  Blog.findByIdAndDelete(request.params.id)
-    .then(result => {
-      response.status(204).end()
-    })
-    .catch(error => next(error))
+blogRouter.get('/:id', async (request, response, next) => {
+  try {
+    const blog = await Blog.findById(request.params.id)
+    if (blog) {
+      response.json(blog)
+    } else {
+      response.status(404).end()
+    }
+  } catch(exception) {
+    next(exception)
+  }
 })
 
-blogRouter.post('/', (request, response, next) => {
+blogRouter.delete('/:id', async (request, response, next) => {
+  try {
+    await Blog.findByIdAndDelete(request.params.id)
+    response.status(204).end()
+  } catch(exception) {
+    next(exception)
+  }
+})
+
+blogRouter.post('/', async (request, response, next) => {
   const body = request.body
   // const { name, number } = body
 
@@ -54,12 +53,20 @@ blogRouter.post('/', (request, response, next) => {
     likes: body.likes,
   })
 
-  blog
-    .save()
-    .then(savedBlog => {
-      response.status(201).json(savedBlog)
-    })
-    .catch(error => next(error))
+  try {
+    const savedBlog = await blog.save()
+    response.status(201).json(savedBlog)
+  }
+  catch(exception) {
+    next(exception)
+  }
+
+  // blog
+  //   .save()
+  //   .then(savedBlog => {
+  //     response.status(201).json(savedBlog)
+  //   })
+  //   .catch(error => next(error))
 
   // Blog.find({ name: body.name }).then(blogs => {
   //   let id = blogs.map(person => person.id)[0]
