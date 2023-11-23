@@ -17,29 +17,20 @@ const Blog = require('../models/blog')
 blogRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({})
   response.json(blogs)
-  // .catch(error => next(error))
 })
 
 blogRouter.get('/:id', async (request, response, next) => {
-  try {
-    const blog = await Blog.findById(request.params.id)
-    if (blog) {
-      response.json(blog)
-    } else {
-      response.status(404).end()
-    }
-  } catch(exception) {
-    next(exception)
+  const blog = await Blog.findById(request.params.id)
+  if (blog) {
+    response.json(blog)
+  } else {
+    response.status(404).end()
   }
 })
 
 blogRouter.delete('/:id', async (request, response, next) => {
-  try {
-    await Blog.findByIdAndDelete(request.params.id)
-    response.status(204).end()
-  } catch(exception) {
-    next(exception)
-  }
+  await Blog.findByIdAndDelete(request.params.id)
+  response.status(204).end()
 })
 
 blogRouter.post('/', async (request, response, next) => {
@@ -53,20 +44,10 @@ blogRouter.post('/', async (request, response, next) => {
     likes: body.likes,
   })
 
-  try {
-    const savedBlog = await blog.save()
-    response.status(201).json(savedBlog)
-  }
-  catch(exception) {
-    next(exception)
-  }
+  if (!blog.likes) blog.likes = 0
 
-  // blog
-  //   .save()
-  //   .then(savedBlog => {
-  //     response.status(201).json(savedBlog)
-  //   })
-  //   .catch(error => next(error))
+  const savedBlog = await blog.save()
+  response.status(201).json(savedBlog)
 
   // Blog.find({ name: body.name }).then(blogs => {
   //   let id = blogs.map(person => person.id)[0]

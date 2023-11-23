@@ -7,7 +7,6 @@ const blogSchema = new mongoose.Schema({
   },
   author:  {
     type: String,
-    required: true
   },
   url: {
     type: String,
@@ -15,7 +14,6 @@ const blogSchema = new mongoose.Schema({
   },
   likes: {
     type: Number,
-    required: true
   }
 })
 

@@ -8,10 +8,11 @@ const helper = require('./test_helper')
 beforeEach(async () => {
   await Blog.deleteMany({})
 
-  for (let i = 0; i < helper.initialBlogs.length; i++) {
-    let blogObject = new Blog(helper.initialBlogs[i])
-    await blogObject.save()
-  }
+  const blogObjects = helper.initialBlogs
+    .map(blog => new Blog(blog))
+
+  const promiseArray = blogObjects.map(blog => blog.save())
+  await Promise.all(promiseArray)
 }, 100000)
 
 test('blogs are returned as json', async () => {
@@ -27,6 +28,10 @@ test('all blogs are returned', async () => {
   expect(response.body).toHaveLength(helper.initialBlogs.length)
 })
 
+test('the unique identifier property of the blog posts is named id', async () => {
+  const response = await api.get('/api/blogs')
+  response.body.map(r => expect(r.id).toBeDefined())
+})
 
 test('a specific blog is within the returned notes', async () => {
   const response = await api.get('/api/blogs')
@@ -55,15 +60,42 @@ test('a valid blog can be added', async () => {
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
 
   const titles = blogsAtEnd.map(b => b.title)
-  expect(titles).toContain(
-    'async/await simplifies making async calls'
-  )
+  expect(titles).toContain(newBlog.title)
+
+  const authors = blogsAtEnd.map(b => b.author)
+  expect(authors).toContain(newBlog.author)
+
+  // const urls = blogsAtEnd.map(b => b.url)
+  // expect(urls).toContain(newBlog.url)
+
+  const likes = blogsAtEnd.map(b => b.likes)
+  expect(likes).toContain(newBlog.likes)
+})
+
+test('blog without likes property is assigned with likes = 0', async () => {
+
+  const newBlog = {
+    title: 'async/await simplifies making async calls',
+    author: 'me',
+    url: 'me.com',
+  }
+
+  if (!newBlog.likes) newBlog.likes = 0
+
+  const resultBlog = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  expect(resultBlog.body.likes).toEqual(0)
 })
 
 
-test('blog without title is not added', async () => {
+test('a blog without title or url is not added', async () => {
   const newBlog = {
-    title: true
+    likes: 5,
+    author: 'me'
   }
 
   await api
