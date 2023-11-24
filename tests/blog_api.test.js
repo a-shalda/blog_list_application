@@ -15,7 +15,7 @@ beforeEach(async () => {
   await Promise.all(promiseArray)
 }, 100000)
 
-describe('when there is initially some notes saved', () => {
+describe('when there is initially some blogs saved', () => {
   test('blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
@@ -28,7 +28,7 @@ describe('when there is initially some notes saved', () => {
     expect(response.body).toHaveLength(helper.initialBlogs.length)
   })
 
-  test('a specific blog is within the returned notes', async () => {
+  test('a specific blog is within the returned blogs', async () => {
     const response = await api.get('/api/blogs')
     const titles = response.body.map(r => r.title)
     expect(titles).toContain(
@@ -37,7 +37,7 @@ describe('when there is initially some notes saved', () => {
 })
 
 
-describe('viewing a specific note', () => {
+describe('viewing a specific blog', () => {
   test('a specific blog can be viewed', async () => {
     const blogsAtStart = await helper.blogsInDb()
 
@@ -74,7 +74,7 @@ describe('viewing a specific note', () => {
 })
 
 
-describe('addition of a new note', () => {
+describe('addition of a new blog', () => {
   test('a valid blog can be added', async () => {
     const newBlog = {
       title: 'async/await simplifies making async calls',
@@ -141,7 +141,7 @@ describe('addition of a new note', () => {
 })
 
 
-describe('deletion of a note', () => {
+describe('deletion of a blog', () => {
   test('a blog can be deleted', async () => {
     const blogsAtStart = await helper.blogsInDb()
     const blogToDelete = blogsAtStart[0]
@@ -159,6 +159,28 @@ describe('deletion of a note', () => {
     const titles = blogsAtEnd.map(r => r.title)
 
     expect(titles).not.toContain(blogToDelete.title)
+  })
+})
+
+
+describe('update', () => {
+  test('a blog can be updated only with the number of likes', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+
+    const newBlog = {
+      likes: 50,
+    }
+
+    const resultBlog = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(newBlog)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    expect(resultBlog.body.likes).toBe(newBlog.likes)
+    expect(resultBlog.body.author).toBe(blogToUpdate.author)
+    expect(resultBlog.body.url).toBe(blogToUpdate.url)
   })
 })
 
