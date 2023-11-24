@@ -76,11 +76,13 @@ describe('viewing a specific blog', () => {
 
 describe('addition of a new blog', () => {
   test('a valid blog can be added', async () => {
+
     const newBlog = {
       title: 'async/await simplifies making async calls',
       author: 'me',
       url: 'me.com',
       likes: 1,
+      userId: '656058f0288eda812d6ebee3'
     }
 
     await api
@@ -126,6 +128,7 @@ describe('addition of a new blog', () => {
       title: 'async/await simplifies making async calls',
       author: 'me',
       url: 'me.com',
+      user: '656058f0288eda812d6ebee3'
     }
 
     if (!newBlog.likes) newBlog.likes = 0
