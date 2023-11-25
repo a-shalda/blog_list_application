@@ -5,6 +5,19 @@ const api = supertest(app)
 const Blog = require('../models/blog')
 const helper = require('./test_helper')
 
+//Auth
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
+const User = require('../models/user')
+const userOneId = new mongoose.Types.ObjectId()
+const userOne = {
+  _id: userOneId,
+  username: 'German',
+  // tokens:[{
+  //   token: jwt.sign({ _id: userOneId }, process.env.SECRET)
+  // }]
+}
+
 beforeEach(async () => {
   await Blog.deleteMany({})
 
@@ -13,7 +26,18 @@ beforeEach(async () => {
 
   const promiseArray = blogObjects.map(blog => blog.save())
   await Promise.all(promiseArray)
+
+
+  //Deliting all users and creating a new user
+  await User.deleteMany()
+  const passwordHash = await bcrypt.hash('secret', 10)
+  userOne.passwordHash = passwordHash
+  const user = new User(userOne)
+  await user.save()
+
 }, 100000)
+
+
 
 describe('when there is initially some blogs saved', () => {
   test('blogs are returned as json', async () => {
@@ -74,19 +98,28 @@ describe('viewing a specific blog', () => {
 })
 
 
+
 describe('addition of a new blog', () => {
   test('a valid blog can be added', async () => {
+
+    const result = await api
+      .post('/api/login')
+      .send({
+        username: userOne.username,
+        password: 'secret'
+      })
+      .expect(200)
 
     const newBlog = {
       title: 'async/await simplifies making async calls',
       author: 'me',
       url: 'me.com',
-      likes: 1,
-      userId: '656058f0288eda812d6ebee3'
+      likes: 1
     }
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${result.body.token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -108,6 +141,15 @@ describe('addition of a new blog', () => {
   })
 
   test('a blog without title or url is not added', async () => {
+
+    const result = await api
+      .post('/api/login')
+      .send({
+        username: userOne.username,
+        password: 'secret'
+      })
+      .expect(200)
+
     const newBlog = {
       likes: 5,
       author: 'me'
@@ -115,6 +157,7 @@ describe('addition of a new blog', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${result.body.token}`)
       .send(newBlog)
       .expect(400)
 
@@ -123,6 +166,14 @@ describe('addition of a new blog', () => {
   }, 100000)
 
   test('blog without likes property is assigned with likes = 0', async () => {
+
+    const result = await api
+      .post('/api/login')
+      .send({
+        username: userOne.username,
+        password: 'secret'
+      })
+      .expect(200)
 
     const newBlog = {
       title: 'async/await simplifies making async calls',
@@ -135,6 +186,7 @@ describe('addition of a new blog', () => {
 
     const resultBlog = await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${result.body.token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
