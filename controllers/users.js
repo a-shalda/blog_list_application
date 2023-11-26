@@ -1,15 +1,8 @@
 const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
+const middleware = require('../utils/middleware')
 const User = require('../models/user')
-const jwt = require('jsonwebtoken')
 
-const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '')
-  }
-  return null
-}
 
 usersRouter.get('/', async (request, response) => {
   const users = await User
@@ -17,6 +10,7 @@ usersRouter.get('/', async (request, response) => {
     .populate('blogs', { title: 1, author: 1, likes: 1 })
   response.json(users)
 })
+
 
 usersRouter.post('/', async (request, response) => {
   const body = request.body
@@ -42,6 +36,7 @@ usersRouter.post('/', async (request, response) => {
   response.status(201).json(savedUser)
 })
 
+
 usersRouter.get('/:id', async (request, response) => {
   const user = await User.findById(request.params.id)
   if (user) {
@@ -51,14 +46,14 @@ usersRouter.get('/:id', async (request, response) => {
   }
 })
 
-usersRouter.delete('/:id', async (request, response) => {
 
-  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
+usersRouter.delete('/:id', middleware.userExtractor, async (request, response) => {
+
+  if (!request.user) {
+    return response.status(401).json({ error: 'unauthorized' })
   }
-  else if (decodedToken.id !== request.params.id) {
-    return response.status(401).json({ error: 'only logged in user can delete their account' })
+  if (request.params.id !== request.user.id) {
+    return response.status(401).json({ error: 'only logged in users can delete their blogs' })
   }
 
   await User.findByIdAndDelete(request.params.id)
