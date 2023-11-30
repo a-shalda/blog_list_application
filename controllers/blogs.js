@@ -1,6 +1,7 @@
 const blogRouter = require('express').Router()
 const middleware = require('../utils/middleware')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 
 blogRouter.get('/', async (request, response) => {
@@ -61,8 +62,14 @@ blogRouter.put('/:id', middleware.userExtractor, async (request, response) => {
 
   const blog = await Blog.findById(request.params.id)
 
-  if (blog.user.toString() !== request.user.id) {
-    return response.status(401).json({ error: 'only logged in users can update their blogs' })
+  if (!request.user.id) {
+    return response.status(401).json({ error: 'only logged in users can update blogs' })
+  }
+
+  const user = await User.findById(request.user.id)
+
+  if (!user) {
+    return response.status(401).json({ error: 'only logged in users can update blogs' })
   }
 
   const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, { likes }, { new: true, runValidators: true, context: 'query' })
