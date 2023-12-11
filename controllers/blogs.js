@@ -32,6 +32,7 @@ blogRouter.get('/:id/comments', async (request, response) => {
   }
 })
 
+
 blogRouter.post('/:id/comments', async (request, response) => {
   const body = request.body
 
@@ -89,11 +90,11 @@ blogRouter.put('/:id', middleware.userExtractor, async (request, response) => {
     return response.status(401).json({ error: 'only logged in users can update blogs' })
   }
 
-  const user = await User.findById(request.user.id)
+  // const user = await User.findById(request.user.id)
 
-  if (!user) {
-    return response.status(401).json({ error: 'only logged in users can update blogs' })
-  }
+  // if (!user) {
+  //   return response.status(401).json({ error: 'only logged in users can update blogs' })
+  // }
 
   const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, { likes }, { new: true, runValidators: true, context: 'query' })
   response.status(200).json(updatedBlog)
