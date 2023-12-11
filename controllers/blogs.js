@@ -5,7 +5,7 @@ const User = require('../models/user')
 const Comment = require('../models/comment')
 
 
-blogRouter.get('/', middleware.userExtractor, async (request, response) => {
+blogRouter.get('/', async (request, response) => {
   const blogs = await Blog
     .find({})
     .populate('user', { username: 1, name: 1 })
@@ -13,7 +13,7 @@ blogRouter.get('/', middleware.userExtractor, async (request, response) => {
 })
 
 
-blogRouter.get('/:id', middleware.userExtractor, async (request, response) => {
+blogRouter.get('/:id', async (request, response) => {
   const blog = await Blog.findById(request.params.id)
   if (blog) {
     response.json(blog)
@@ -22,7 +22,7 @@ blogRouter.get('/:id', middleware.userExtractor, async (request, response) => {
   }
 })
 
-blogRouter.get('/:id/comments', middleware.userExtractor, async (request, response) => {
+blogRouter.get('/:id/comments', async (request, response) => {
   const comments = await Comment.find({})
 
   if (comments) {
@@ -33,7 +33,7 @@ blogRouter.get('/:id/comments', middleware.userExtractor, async (request, respon
 })
 
 
-blogRouter.post('/:id/comments', middleware.userExtractor, async (request, response) => {
+blogRouter.post('/:id/comments', async (request, response) => {
   const body = request.body
 
   const newComment = new Comment({
@@ -46,7 +46,7 @@ blogRouter.post('/:id/comments', middleware.userExtractor, async (request, respo
 })
 
 
-blogRouter.post('/', middleware.userExtractor, async (request, response) => {
+blogRouter.post('/', async (request, response) => {
   const body = request.body
   const user = request.user
 

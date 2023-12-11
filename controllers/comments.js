@@ -5,7 +5,7 @@ const User = require('../models/user')
 const Comment = require('../models/comment')
 
 
-commentsRouter.get('/', middleware.userExtractor, async (request, response) => {
+commentsRouter.get('/', async (request, response) => {
   const comments = await Comment.find({})
 
   if (comments) {
@@ -16,7 +16,7 @@ commentsRouter.get('/', middleware.userExtractor, async (request, response) => {
 })
 
 
-commentsRouter.delete('/:id', middleware.userExtractor, async (request, response) => {
+commentsRouter.delete('/:id', async (request, response) => {
 
   const comment = await Comment.findById(request.params.id)
 
