@@ -5,7 +5,7 @@ const User = require('../models/user')
 const Comment = require('../models/comment')
 
 
-commentsRouter.get('/', async (request, response) => {
+commentsRouter.get('/', middleware.userExtractor, async (request, response) => {
   const comments = await Comment.find({})
 
   if (comments) {
