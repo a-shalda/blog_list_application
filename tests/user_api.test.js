@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
-const bcrypt = require('bcrypt')
+const bcryptjs = require('bcryptjs')
 const User = require('../models/user')
 const helper = require('./test_helper')
 
@@ -16,7 +16,7 @@ const userOne = {
 
 beforeEach(async () => {
   await User.deleteMany()
-  const passwordHash = await bcrypt.hash('secret', 10)
+  const passwordHash = await bcryptjs.hash('secret', 10)
   userOne.passwordHash = passwordHash
   const user = new User(userOne)
   await user.save()

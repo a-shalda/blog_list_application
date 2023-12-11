@@ -6,7 +6,7 @@ const Blog = require('../models/blog')
 const helper = require('./test_helper')
 
 //Auth
-const bcrypt = require('bcrypt')
+const bcryptjs = require('bcryptjs')
 const User = require('../models/user')
 const userOneId = new mongoose.Types.ObjectId()
 const userOne = {
@@ -27,7 +27,7 @@ beforeEach(async () => {
 
   //Deliting all users and creating a new user
   await User.deleteMany()
-  const passwordHash = await bcrypt.hash('secret', 10)
+  const passwordHash = await bcryptjs.hash('secret', 10)
   userOne.passwordHash = passwordHash
   const user = new User(userOne)
   await user.save()
