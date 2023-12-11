@@ -46,7 +46,7 @@ blogRouter.post('/:id/comments', async (request, response) => {
 })
 
 
-blogRouter.post('/', async (request, response) => {
+blogRouter.post('/', middleware.userExtractor, async (request, response) => {
   const body = request.body
   const user = request.user
 
