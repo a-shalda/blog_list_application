@@ -37,6 +37,6 @@ if (process.env.NODE_ENV === 'test') {
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
-// app.use(express.static('dist'))
+app.use(express.static('dist'))
 
 module.exports = app
