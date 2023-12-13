@@ -4,19 +4,6 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 const Comment = require('../models/comment')
 
-const Order = require('../models/order')
-
-blogRouter.post('/order', async (request, response) => {
-  const body = request.body
-
-  const order = new Order({
-    order: body,
-  })
-
-  const savedOrder = await order.save()
-  response.status(201).json(savedOrder)
-})
-
 
 blogRouter.get('/', async (request, response) => {
   const blogs = await Blog
