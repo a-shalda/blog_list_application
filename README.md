@@ -2,7 +2,6 @@
 
 https://blogsapp.shalda.dev/
 
-Sign up and create links to blogs, vote for your favorite ones, post comments, see users' statistics, delete your blogs. 
-May take a while to open, deployed on Render.com
+Full-stack web app in which users can create and delete blogs, vote for them and leave comments. May take a while to open, deployed on Render.com
 
 // Tech stack: React, React Router, Redux Toolkit, Node, Express, MongoDB, Mongoose, Token authentication, Cypress, Jest
